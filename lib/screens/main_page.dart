@@ -5,10 +5,14 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
+import 'package:provider/provider.dart';
 import 'package:rider/constants/constants.dart';
 import 'package:rider/global_variables.dart';
 import 'package:rider/brand_colors.dart';
 import 'package:rider/components/brand_divider.dart';
+import 'package:rider/provider/app_data.dart';
+import 'package:rider/screens/search_page.dart';
+import 'package:rider/utils/request_helper_methods.dart';
 
 class MainPage extends StatefulWidget {
   static const String id = 'mainPage';
@@ -44,6 +48,10 @@ class _MainPageState extends State<MainPage> {
     LatLng pos = LatLng(position.latitude, position.longitude);
     CameraPosition cp = new CameraPosition(target: pos, zoom: 14);
     googleMap.animateCamera(CameraUpdate.newCameraPosition(cp));
+
+    String address =
+        await HelperMethods.findCordinateAddress(position, context);
+    debugPrint(address);
   }
 
   @override
@@ -57,7 +65,7 @@ class _MainPageState extends State<MainPage> {
             mapType: MapType.normal,
             myLocationButtonEnabled: true,
             myLocationEnabled: true,
-            zoomGesturesEnabled: true,
+            zoomGesturesEnabled: false,
             zoomControlsEnabled: true,
             initialCameraPosition: _kGooglePlex,
             onMapCreated: (GoogleMapController controller) {
@@ -125,29 +133,32 @@ class _MainPageState extends State<MainPage> {
                         style:
                             TextStyle(fontSize: 18, fontFamily: 'Brand-Bold')),
                     SizedBox(height: 20),
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Icon(Icons.search, color: Colors.blueAccent),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Text('Search destination')
-                          ],
+                    GestureDetector(
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage())),
+                      child: Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Icon(Icons.search, color: Colors.blueAccent),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text('Search destination')
+                            ],
+                          ),
                         ),
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(4),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 5.0,
+                                  spreadRadius: 0.5,
+                                  offset: Offset(0.7, 0.7))
+                            ]),
                       ),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 5.0,
-                                spreadRadius: 0.5,
-                                offset: Offset(0.7, 0.7))
-                          ]),
                     ),
                     SizedBox(
                       height: 22,

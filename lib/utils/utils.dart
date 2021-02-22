@@ -8,4 +8,12 @@ class Utils {
     key.currentState.showSnackBar(snackBar);
   }
 
+  static double screenHeigthValue(BuildContext context){
+    return MediaQuery.of(context).size.height;
+  }
+
+  static double screenWidthValue(BuildContext context){
+    return MediaQuery.of(context).size.width;
+  }
+
 }
