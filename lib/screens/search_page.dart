@@ -1,13 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:rider/brand_colors.dart';
+import 'package:rider/components/brand_divider.dart';
+import 'package:rider/components/prediction_tile.dart';
+import 'package:rider/constants/constants.dart';
+import 'package:rider/model/prediction.dart';
 import 'package:rider/provider/app_data.dart';
+import 'package:rider/utils/request_helper.dart';
+import 'package:rider/utils/request_helper_methods.dart';
 import 'package:rider/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 class SearchPage extends StatefulWidget {
   static String id = 'searchPage';
-
 
   @override
   _SearchPageState createState() => _SearchPageState();
@@ -16,13 +22,36 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   var pickupController = TextEditingController();
   var destinationController = TextEditingController();
+  var focusDestination = FocusNode();
+  List newsPrecitions = [];
+
+  bool focused = false;
+  void setFocus() {
+    if (!focused) {
+      FocusScope.of(context).requestFocus(focusDestination);
+      focused = true;
+    }
+  }
+
+  void updateSearchState(String placeName) async {
+    List<Prediction> newList = [];
+    newList = await HelperMethods.searchPlace(placeName);
+    setState(() {
+      newsPrecitions = newList;
+    });
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     double heightValue = Utils.screenHeigthValue(context);
     double widthValue = Utils.screenWidthValue(context);
-    String currentAddress = Provider.of<AppData>(context).pickupAddress != null ? Provider.of<AppData>(context).pickupAddress.placeFormattedAddress : '';
+    String currentAddress = Provider.of<AppData>(context).pickupAddress != null
+        ? Provider.of<AppData>(context).pickupAddress.placeFormattedAddress
+        : '';
     pickupController.text = currentAddress;
+    setFocus();
 
     return Scaffold(
       body: Column(
@@ -98,9 +127,13 @@ class _SearchPageState extends State<SearchPage> {
                             borderRadius: BorderRadius.circular(50),
                           ),
                           child: TextField(
+                            onChanged: (value) {
+                              updateSearchState(value);
+                            },
                             controller: destinationController,
+                            focusNode: focusDestination,
                             decoration: InputDecoration(
-                                hintText: 'Pickup location',
+                                hintText: 'Where to?',
                                 filled: true,
                                 fillColor: BrandColors.colorLightGrayFair,
                                 border: InputBorder.none,
@@ -116,6 +149,23 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
           ),
+
+          (newsPrecitions.length > 0) ?
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: ListView.separated(
+              padding: EdgeInsets.all(0),
+              itemBuilder: (context, index) {
+                return PredictionTile(
+                  prediction: newsPrecitions[index],
+                );
+              },
+              separatorBuilder: (context, index) => BrandDivider(),
+              itemCount: newsPrecitions.length,
+              shrinkWrap: true,
+              physics: ClampingScrollPhysics(),
+            ),
+          ) : Container()
         ],
       ),
     );
