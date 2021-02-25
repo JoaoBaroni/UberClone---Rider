@@ -5,8 +5,9 @@ class DefaultButton extends StatelessWidget {
   final String valueName;
   final VoidCallback callback;
   final double customHeight;
+  final double customWidth;
 
-  DefaultButton({this.valueName, this.callback, this.customHeight});
+  DefaultButton({this.valueName, this.callback, this.customHeight, this.customWidth});
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
@@ -17,6 +18,7 @@ class DefaultButton extends StatelessWidget {
       textColor: Colors.white,
       child: Container(
         height: customHeight,
+        width: customWidth,
         child: Center(
             child: Text(
               '$valueName',

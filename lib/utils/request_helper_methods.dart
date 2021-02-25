@@ -69,9 +69,9 @@ class HelperMethods {
       return [];
     }
   }
-  static Future<void> setDestionationDetails(String placeID, BuildContext context) async {
+  static void setDestionationDetails(String placeID, BuildContext context) async {
 
-    showDialog(context: context, builder: (context) => ProgressDialog(status: 'Please wait...',),);
+    //showDialog(context: context, builder: (context) => ProgressDialog(status: 'Please wait...',),);
     
     final String urlGoogleDetails = 'https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeID}&key=${API_KEY}';
     var response = await RequestHelper.getRequest(urlGoogleDetails);
@@ -89,9 +89,11 @@ class HelperMethods {
 
       Provider.of<AppData>(context, listen: false).updateDestinationAddres(detailedAddress);
       debugPrint(detailedAddress.placeName);
+
+      Navigator.pop(context, 'getDestination');
     }
 
-    Navigator.pop(context);
+
   }
 
 
