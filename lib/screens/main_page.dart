@@ -34,6 +34,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
   double mapBottomPading = 0;
   double searchSheetHeight = 300;
   bool isLoading = true;
+  bool isDetailOpen = false;
   GoogleMapController googleMap;
   Position currentPosition;
 
@@ -157,7 +158,23 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
     setState(() {
       rideDetailsHeight = 220;
       searchSheetHeight = 0;
+      isDetailOpen = true;
     });
+  }
+
+  void hideDetailsSheet(){
+
+    CameraPosition cp = new CameraPosition(target: LatLng(Provider.of<AppData>(context, listen: false).pickupAddress.latitude, Provider.of<AppData>(context, listen: false).pickupAddress.longitude), zoom: 14);
+    googleMap.animateCamera(CameraUpdate.newCameraPosition(cp));
+
+    setState(() {
+      searchSheetHeight = 300;
+      isDetailOpen      = false;
+      rideDetailsHeight = 0;
+      _markers.clear();
+      polylines.clear();
+    });
+
   }
 
   @override
@@ -188,7 +205,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
             left: 20,
             child: GestureDetector(
               onTap: () {
-                _scaffoldState.currentState.openDrawer();
+                !isDetailOpen? _scaffoldState.currentState.openDrawer() : hideDetailsSheet();
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -204,10 +221,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
                 child: CircleAvatar(
                   backgroundColor: Colors.white,
                   radius: 20,
-                  child: Icon(
+                  child: (isDetailOpen ? Icon(Icons.arrow_back, color: Colors.black,) : Icon(
                     Icons.menu,
                     color: Colors.black,
-                  ),
+                  ))
                 ),
               ),
             ),
@@ -351,7 +368,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
             right: 0,
             bottom: 0,
             child: AnimatedSize(
-              duration: Duration(milliseconds: 150),
+              duration: Duration(milliseconds: 250),
               vsync: this,
               curve: Curves.ease,
               child: Container(
